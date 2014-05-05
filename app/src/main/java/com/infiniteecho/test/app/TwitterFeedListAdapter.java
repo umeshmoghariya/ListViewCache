@@ -1,17 +1,12 @@
 package com.infiniteecho.test.app;
 
-import com.infiniteecho.test.app.R;
-
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,12 +79,6 @@ public class TwitterFeedListAdapter extends ArrayAdapter<String> {
         };
     }
 
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
-        }
-    }
-
     public Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
     }
@@ -115,17 +104,17 @@ public class TwitterFeedListAdapter extends ArrayAdapter<String> {
         holder.text.setText(tweetList.get(position));
 
         holder.position = position;
-        new ThumbnailTask(position, holder)
+        new GetImagesFromDiskAsyncTask(position, holder)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
 
         return convertView;
 
     }
-    private class ThumbnailTask extends AsyncTask<Void, Bitmap, Bitmap> {
+    private class GetImagesFromDiskAsyncTask extends AsyncTask<Void, Bitmap, Bitmap> {
         private int mPosition;
         private ViewHolder mHolder;
 
-        public ThumbnailTask(int position, ViewHolder holder) {
+        public GetImagesFromDiskAsyncTask(int position, ViewHolder holder) {
             mPosition = position;
             mHolder = holder;
         }

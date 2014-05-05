@@ -34,20 +34,12 @@ public class TwitterFeedActivity extends ListActivity  {
         CreateFileHashAsync createFileHashAsync = new CreateFileHashAsync();
         createFileHashAsync.execute();
 
-
-
-
-
     }
 
 
     private class LoadTweetsAsync extends AsyncTask<Void, Void, Void> {
        // private Context mContext;
         private List<String> tweetList = new ArrayList<String>();
-
-//        public LoadTweetsAsync(Context context) {
-//            mContext = context;
-//        }
 
         protected void onPreExecute() {
             super.onPreExecute();
