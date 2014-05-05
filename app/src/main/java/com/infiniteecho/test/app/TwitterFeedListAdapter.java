@@ -8,11 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,14 +28,14 @@ import java.util.Random;
 /**
  * Created by umesh on 4/30/14.
  */
-public class MobileArrayAdapter extends ArrayAdapter<String> {
+public class TwitterFeedListAdapter extends ArrayAdapter<String> {
     private final Context context;
     private List<String> tweetList = new ArrayList<String>();
     private List<String> fileList = new ArrayList<String>();
     private String imagePath = "sdcard/imgs/";
     private LruCache<String,Bitmap> mMemoryCache;
 
-    public MobileArrayAdapter(Context context, List<String> tweetList, List<String> fileList) {
+    public TwitterFeedListAdapter(Context context, List<String> tweetList, List<String> fileList) {
         super(context, R.layout.list_mobile, tweetList);
         this.context = context;
         this.tweetList = tweetList;
@@ -44,8 +47,32 @@ public class MobileArrayAdapter extends ArrayAdapter<String> {
         // int in its constructor.
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
-        // Use 1/8th of the available memory for this memory cache.
-        final int cacheSize = maxMemory / 4;
+        /*Google advices [Shows in demos] using 1/8th of the available memory for this memory cache.
+        *To obtain better performance
+        */
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+        final int cacheDivisor;
+        switch(metrics.densityDpi) {
+
+            //High Density. 480 DPI
+            case 480:
+                cacheDivisor = 4;
+                break;
+
+            //320 DPI
+            case 320:
+                cacheDivisor = 3;
+                break;
+            default:
+                cacheDivisor = 2;
+                break;
+        }
+
+        final int cacheSize = maxMemory / cacheDivisor;
+
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(String key, Bitmap bitmap) {

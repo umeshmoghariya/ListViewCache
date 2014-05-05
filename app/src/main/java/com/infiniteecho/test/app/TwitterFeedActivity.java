@@ -1,12 +1,10 @@
 package com.infiniteecho.test.app;
 
-import com.infiniteecho.test.app.MobileArrayAdapter;
 import android.app.ListActivity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.view.View;
@@ -15,16 +13,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by umesh on 4/30/14.
  */
-public class ListMobileActivity extends ListActivity  {
+public class TwitterFeedActivity extends ListActivity  {
 
 
     private Context mContext;
@@ -72,7 +67,7 @@ public class ListMobileActivity extends ListActivity  {
             File sdcard = Environment.getExternalStorageDirectory();
 
             //Get the text file
-            File file = new File(sdcard,"35kb.csv");
+            File file = new File(sdcard,"5kb.csv");
 
             //Read text from file
             StringBuilder text = new StringBuilder();
@@ -100,7 +95,7 @@ public class ListMobileActivity extends ListActivity  {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
 
-            setListAdapter(new MobileArrayAdapter(mContext, tweetList, fileList));
+            setListAdapter(new TwitterFeedListAdapter(mContext, tweetList, fileList));
 
             // do something with data here-display it or send to mainactivity
 
