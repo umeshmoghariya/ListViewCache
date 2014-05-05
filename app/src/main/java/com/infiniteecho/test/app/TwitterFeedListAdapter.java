@@ -48,7 +48,8 @@ public class TwitterFeedListAdapter extends ArrayAdapter<String> {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
 
         /*Google advices [Shows in demos] using 1/8th of the available memory for this memory cache.
-        *To obtain better performance
+        *To obtain better performance I am allocating cache memory based on Display Density [DPI].
+         * As featured in Google IO Networking Library 2013.
         */
 
         DisplayMetrics metrics = new DisplayMetrics();
