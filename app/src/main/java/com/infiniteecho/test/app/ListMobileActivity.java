@@ -72,7 +72,7 @@ public class ListMobileActivity extends ListActivity  {
             File sdcard = Environment.getExternalStorageDirectory();
 
             //Get the text file
-            File file = new File(sdcard,"5kb.csv");
+            File file = new File(sdcard,"35kb.csv");
 
             //Read text from file
             StringBuilder text = new StringBuilder();

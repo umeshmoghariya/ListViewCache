@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +30,41 @@ public class MobileArrayAdapter extends ArrayAdapter<String> {
     private List<String> tweetList = new ArrayList<String>();
     private List<String> fileList = new ArrayList<String>();
     private String imagePath = "sdcard/imgs/";
+    private LruCache<String,Bitmap> mMemoryCache;
+
     public MobileArrayAdapter(Context context, List<String> tweetList, List<String> fileList) {
         super(context, R.layout.list_mobile, tweetList);
         this.context = context;
         this.tweetList = tweetList;
         this.fileList = fileList;
+
+
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 4;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context
@@ -76,10 +106,22 @@ public class MobileArrayAdapter extends ArrayAdapter<String> {
         protected Bitmap doInBackground(Void... arg0) {
             // Download bitmap here
 
-            File imageFile = new File(imagePath+fileList.get(mPosition));
-            Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+            if(getBitmapFromMemCache(mPosition+"")==null)
+            {
+                Log.i("Cache","Miss");
+                File imageFile = new File(imagePath+fileList.get(mPosition));
+                Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                mMemoryCache.put(mPosition+"", bitmap);
+                return bitmap;
+            }
+            else
+            {
+                Log.i("Cache", "Hit");
+                Bitmap bitmap = getBitmapFromMemCache(mPosition+"");
+                return bitmap;
+            }
 
-            return bitmap;
+
         }
 
         @Override
